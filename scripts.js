@@ -206,8 +206,8 @@ function initFxCanvas() {
 
     let price = 100 + Math.random() * 10;
     let lastClose = price;
-    let vol = 0.015; // volatilité de base plus douce
-    let targetVol = 0.015;
+    let vol = 0.008; // volatilité réduite pour des bougies plus stables
+    let targetVol = 0.008;
     // Dérive haussière contrôlée
     let drift = 0.0003;
     let targetDrift = 0.0003;
@@ -231,7 +231,7 @@ function initFxCanvas() {
     let baseLog = Math.log(price);
     let emaLog = baseLog; // suivi lent du niveau
     let cameraCenterLog = baseLog; // centre vertical de la caméra
-    let baseRangeLog = 0.2; // plage log figée (mise à jour après préremplissage)
+    let baseRangeLog = 0.022; // plage log fixe pour des bougies de taille constante
     let followRef = null; // fonction de suivi (pour secondaire)
 
     function randn() {
@@ -250,7 +250,7 @@ function initFxCanvas() {
       // volatilité qui dérive doucement (clusters)
       volTimer += dt;
       if (volTimer > 1200 + Math.random() * 1800) {
-        targetVol = clamp(vol * (0.7 + Math.random() * 1.4), 0.004, 0.06);
+        targetVol = clamp(vol * (0.8 + Math.random() * 0.4), 0.004, 0.025);
         // cible de dérive autour d'une moyenne positive
         targetDrift = 0.00025 + (Math.random() - 0.3) * 0.0005;
         volTimer = 0;
@@ -273,10 +273,10 @@ function initFxCanvas() {
       for (let i = 0; i < ticks; i++) {
         // tendance haussière réaliste: bruit gaussien + drift positif doux,
         // amortir les renversements brutaux pour éviter l'alternance trop régulière
-        let shock = randn() * (vol * 0.8) * Math.sqrt(16 / 1000);
+        let shock = randn() * (vol * 0.6) * Math.sqrt(16 / 1000);
         const meanRev = (lastClose - price) * 0.0005; // légère force de rappel
         // biais directionnel: globalement haussier, mais peut devenir négatif
-        const directional = drift + 0.0006 * trendBias + (bearStreakLeft > 0 ? -0.0012 : 0);
+        const directional = drift + 0.0005 * trendBias + (bearStreakLeft > 0 ? -0.0010 : 0);
         shock += meanRev + directional;
         const prev = price;
         price = Math.max(0.1, price * (1 + shock));
@@ -285,7 +285,7 @@ function initFxCanvas() {
         if (current.h < price) current.h = price;
         if (current.l > price) current.l = price;
         // empêcher la bougie en cours d'écraser trop les précédentes: limiter amplitude incrémentale
-        const maxIntraMove = vol * 6; // borne douce intra-bougie
+        const maxIntraMove = vol * 4; // borne légèrement plus permissive pour grosses bougies
         const move = Math.log(price) - Math.log(prev);
         if (Math.abs(move) > maxIntraMove) {
           const clampSign = move > 0 ? 1 : -1;
@@ -334,10 +334,10 @@ function initFxCanvas() {
         if (bearStreakLeft > 0) {
           bearStreakLeft -= 1;
         } else {
-          // probabilité faible mais non nulle de lancer une séquence rouge 3–6 bougies
-          const pStartBear = 0.07 + Math.max(0, 0.05 - trendBias * 0.04); // un peu plus probable si bias élevé
+          // probabilité élevée de séquences rouges pour équilibrer
+          const pStartBear = 0.12 + Math.max(0, 0.08 - trendBias * 0.06);
           if (Math.random() < pStartBear) {
-            bearStreakLeft = 3 + Math.floor(Math.random() * 4);
+            bearStreakLeft = 1 + Math.floor(Math.random() * 2); // séquences courtes pour éviter enchaînements
           }
         }
       }
@@ -350,8 +350,8 @@ function initFxCanvas() {
       const panelCenterY = panelTop + panelH * 0.5;
       // pixels par unité log figé à partir de baseRangeLog
       const pixelsPerLog = (panelH * 0.9) / Math.max(1e-6, baseRangeLog);
-      // la caméra suit doucement la tendance (ema)
-      cameraCenterLog += (emaLog - cameraCenterLog) * 0.06;
+      // la caméra suit doucement la tendance (ema) - plus lent pour éviter l'écrasement
+      cameraCenterLog += (emaLog - cameraCenterLog) * 0.03;
       const scaleY = (p) => {
         const lp = Math.log(p);
         return panelCenterY - (lp - cameraCenterLog) * pixelsPerLog;
@@ -466,7 +466,7 @@ function initFxCanvas() {
 
   // rendre les bougies plus "pleines": réduire les mèches trop longues et forcer un corps minimum
   function normalizeCandle(c) {
-    const minBody = 0.3; // 30% de l’amplitude devient corps minimum
+    const minBody = 0.2; // 20% de l'amplitude devient corps minimum (plus de mèches)
     const o = c.o, h = c.h, l = c.l, close = c.c;
     const amp = Math.max(1e-6, h - l);
     let body = Math.abs(close - o);
@@ -480,10 +480,10 @@ function initFxCanvas() {
       const newL = Math.min(newO, newC) - amp * 0.2;
       return { o: newO, h: newH, l: newL, c: newC };
     }
-    // limiter mèches extrêmes
-    const cap = amp * 0.8;
-    const hi = Math.min(h, Math.max(o, close) + cap * 0.5);
-    const lo = Math.max(l, Math.min(o, close) - cap * 0.5);
+    // limiter mèches extrêmes (plus de mèches autorisées)
+    const cap = amp * 1.0;
+    const hi = Math.min(h, Math.max(o, close) + cap * 0.7);
+    const lo = Math.max(l, Math.min(o, close) - cap * 0.7);
     return { o, h: hi, l: lo, c: close };
   }
 
@@ -507,7 +507,7 @@ function initFxCanvas() {
         const dt = 16 + Math.random() * 16;
         const ticks = Math.max(1, Math.round(dt / 16));
         for (let i = 0; i < ticks; i++) {
-          const shock = randn() * vol * Math.sqrt(16 / 1000);
+          const shock = randn() * vol * Math.sqrt(100 / 1000);
           price = Math.max(0.1, price * (1 + drift + shock));
           current.h = Math.max(current.h, price);
           current.l = Math.min(current.l, price);
@@ -530,9 +530,8 @@ function initFxCanvas() {
         const high = logs[Math.floor(0.95 * (logs.length-1))];
         const mid = (low + high) / 2;
         cameraCenterLog = mid; // centrer sur le milieu du range initial
-        // plage avec marge légère, bornée pour éviter l'écrasement
-        const range = Math.max(1e-6, high - low);
-        baseRangeLog = clamp(range * 1.2, 0.04, 0.28);
+        // garder la plage initiale fixe pour des bougies de taille constante
+        // baseRangeLog reste inchangé
       }
     })();
 
