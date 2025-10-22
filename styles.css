@@ -248,6 +248,15 @@ body {
 .about-electric-card {
   padding: 2rem;
   margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.about-electric-card.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .about-electric-card::before {
@@ -286,6 +295,26 @@ body {
 .about-text p {
   line-height: 1.7;
   margin-bottom: 1rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1) var(--d, 0ms), 
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1) var(--d, 0ms);
+}
+
+.about-text p.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Couleurs spécifiques pour les sections */
+.about-text .passions-text {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.about-text .parcours-text {
+  color: #dbe7ff;
+  font-weight: 400;
 }
 
 .about-text .stack {

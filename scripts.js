@@ -28,10 +28,76 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupReveal() {
   const revealEls = Array.from(document.querySelectorAll('.reveal-up, .reveal-fade'));
   if (revealEls.length === 0) return;
+  
   const io = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) e.target.classList.add('is-visible');
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-visible');
+      } else {
+        e.target.classList.remove('is-visible');
+      }
+    }
   }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
+  
   revealEls.forEach(el => io.observe(el));
+  
+  // Gestion spéciale pour la section À propos
+  setupAboutSectionAnimation();
+}
+
+// /////// ANIMATION SECTION À PROPOS \\\\ 
+function setupAboutSectionAnimation() {
+  const aboutCard = document.querySelector('.about-electric-card');
+  const aboutTexts = document.querySelectorAll('.about-text p');
+  const aboutSection = document.querySelector('#about');
+  
+  if (!aboutCard || aboutTexts.length === 0 || !aboutSection) return;
+  
+  const aboutObserver = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        aboutCard.classList.add('is-visible');
+        aboutTexts.forEach((text, index) => {
+          setTimeout(() => {
+            text.classList.add('is-visible');
+          }, index * 200);
+        });
+      } else {
+        aboutCard.classList.remove('is-visible');
+        aboutTexts.forEach(text => text.classList.remove('is-visible'));
+      }
+    }
+  }, { rootMargin: '0px 0px -20% 0px', threshold: 0.1 });
+  
+  aboutObserver.observe(aboutCard);
+  
+  // Gestion du masquage quand on est dans le Hero
+  setupHeroVisibility();
+}
+
+// /////// MASQUAGE SECTION À PROPOS DANS LE HERO \\\\ 
+function setupHeroVisibility() {
+  const heroSection = document.querySelector('#home');
+  const aboutSection = document.querySelector('#about');
+  
+  if (!heroSection || !aboutSection) return;
+  
+  const heroObserver = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        aboutSection.style.opacity = '0';
+        aboutSection.style.visibility = 'hidden';
+        aboutSection.style.transform = 'translateY(40px) scale(0.95)';
+        aboutSection.style.transition = 'opacity 0.6s ease, visibility 0.6s ease, transform 0.6s ease';
+      } else {
+        aboutSection.style.opacity = '1';
+        aboutSection.style.visibility = 'visible';
+        aboutSection.style.transform = 'translateY(0) scale(1)';
+      }
+    }
+  }, { rootMargin: '0px 0px -50% 0px', threshold: 0.5 });
+  
+  heroObserver.observe(heroSection);
 }
 
 // /////// PARALLAXE \\\\ 
