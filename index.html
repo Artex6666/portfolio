@@ -117,22 +117,23 @@
         <div class="grid">
           <article class="card tilt reveal-fade" style="--i:0">
             <h3>API de hosting MT5</h3>
-            <p class="muted">Node.js, Docker, Wine/Xvfb, OCR (Tesseract), tracker MQL5.</p>
-            <div class="metric-chart"></div>
-            <p>Dashboard métriques et graphiques temps réel pour exploiter les données des comptes hostés.</p>
+            <p class="muted">Node.js, Docker, Wine/Xvfb, OCR (Tesseract), VNC, xdotool, WebSockets.</p>
+            <p>Architecture scalable et redéployable pour l'hébergement de comptes MT5. Gestion complète de la mémoire, des processus Xvfb, des displays locks, et des connexions VNC.</p>
+            <p>Monitoring automatique pour nettoyer les fenêtres vides des displays, relancer les instances éteintes, et gérer les macros xdotool. Tout accessible via un simple endpoint REST.</p>
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js" class="tech-logo">
           </article>
           <article class="card tilt reveal-fade" style="--i:1">
             <h3>Kara Tools - COT</h3>
-            <p class="muted">Fullstack freelance: intégrations, virtualisation, automatisations, Gestion de comptes MT5 .</p>
-            <p>UX sobre et efficace pour des solutions professionnelles comprennant métrics et statistiques complètes.</p>
-            <p>Solutions instantanées et ultra optimisées pour permettre un trading optimal.</p>
+            <p class="muted">Fullstack freelance: intégrations, virtualisation, automatisations, Gestion de comptes MT5.</p>
+            <p>Dashboard métriques et graphiques temps réel pour exploiter les données des comptes hostés.</p>
+            <p>UX sobre et efficace pour des solutions professionnelles avec métriques et statistiques complètes. Solutions instantanées et ultra optimisées pour permettre un trading optimal.</p>
             <img src="images/Kara.png" alt="Kara Tools" class="tech-logo">
           </article>
           <article class="card tilt reveal-fade" style="--i:2">
             <h3>Discord Bots</h3>
-            <p class="muted">DJS v10, interactions API, persistance JSON/SQLite, déploiement et maintenance. </p>
-            <p> Modération, fun, gestion de serveur et antiraid complet, intégrations API, stockage JSON/SQLite, webhooks, livraisons cadrées.</p>
+            <p class="muted">DJS v10, interactions API, persistance JSON/SQLite, déploiement et maintenance.</p>
+            <p>Développement de dizaines de bots Discord, du simple webhook régulier relié à un pooling API ou cron, à la gestion totale de serveur avec captcha, modération et antiraid avancé.</p>
+            <p>Repérage des comportements suspects, neutralisation des menaces ET des personnes qui invitent les menaces. Base de données complète et système d'apprentissage collaboratif : la communauté forme le bot à travers ses interactions, développant progressivement des capacités de conversation naturelle.</p>
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/discordjs/discordjs-original.svg" alt="Discord.js" class="tech-logo">
           </article>
         </div>
@@ -153,21 +154,36 @@
           <article class="card reveal-fade" style="--i:1">
             <h3>Développeur Fullstack</h3>
             <p class="muted">Kara Tools — Freelance — Paris</p>
-            <p>API/hosting MT5, virtualisation Windows sous Linux, OCR, scripts, dashboard metrics.</p>
+            <div class="metric-chart"></div>
+            <p>API/hosting MT5, virtualisation Windows sous Linux, OCR, scripts, WebApps et Websockets, dashboard metrics, backOffice et FrontOffice</p>
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker" class="tech-logo">
           </article>
           <article class="card reveal-fade" style="--i:2">
             <h3>Développeur DiscordJS</h3>
             <p class="muted">Freelance — Paris • 2019 – 2022</p>
-            <p>Bots Discord (DJS v10), intégrations API, stockage JSON/SQLite, livraisons cadrées.</p>
+            <div class="metric-chart"></div>
+            <p>Bots Discord (DJS v10), intégrations API, stockage JSON/SQLite, livraisons et suivis cadrées.</p>
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/discordjs/discordjs-original.svg" alt="Discord.js" class="tech-logo">
           </article>
           <article class="card reveal-fade" style="--i:3">
+            <h3>Développeur Algorithmes Trading</h3>
+            <p class="muted">Freelance — Paris • 2020 – 2024</p>
+            <div class="metric-chart"></div>
+            <p>Création d'algorithmes de trading MQL5 basés sur des indicateurs et structures de marchés. MQL5, langage bas niveau proche du C, pour des solutions de trading automatisées.</p>
+          </article>
+          <article class="card reveal-fade" style="--i:4">
             <h3>Développeur Fullstack</h3>
             <p class="muted">Projets personnels, scolaires & professionnels — Paris • 2023 – 2025</p>
             <p>Android Kotlin, sites web complets (JWT, backend/frontend), création/optimisation d'EA MT5.</p>
             <p>De NodeJS à ASM, en passant par PHP, Python, Java, C, etc. Mes projets sont généralement axés WEB et fonctionnel, mais je suis fiers de mes autres expériences, je pense entre autres à mes premiers plugins Minecraft en Java.</p>
             <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg" alt="Kotlin" class="tech-logo">
+          </article>
+          <article class="card reveal-fade" style="--i:5">
+            <h3>Développeur</h3>
+            <p class="muted">EquineLedger — Paris • 2020</p>
+            <div class="metric-chart"></div>
+            <p>Webscrapping et interactions base de données pour des solutions de gestion équestre. Développement d'outils d'extraction et de traitement de données.</p>
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" class="tech-logo">
           </article>
         </div>
       </div>
@@ -180,7 +196,7 @@
       </div>
       
       <!-- /////// TECH LOOP \\\\ -->
-      <div class="tech-loop-container">
+      <div class="tech-loop-container reveal-fade">
         <div class="tech-loop">
           <a href="https://developer.mozilla.org/docs/Web/HTML" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5"></a>
           <a href="https://developer.mozilla.org/docs/Web/CSS" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3"></a>
@@ -214,24 +230,31 @@
         </div>
       </div>
       
-      <div class="container two-col">
-        <div>
-          <p class="reveal-up" style="--d:120ms">
-            J’ai naturellement réalisé de nombreux projets web durant mon parcours&nbsp;: développement fullstack, création d’APIs, intégration de technologies variées (HTML, CSS, JavaScript, Vue, React, EJS…). J’ai aussi pas mal travaillé le backend (Node.js, PHP, Java, Python, Express, MQL5) et différentes bases de données (SQL, MongoDB).
-          </p>
-          <p class="reveal-up" style="--d:140ms">
-            En dehors du web, j’ai pu faire beaucoup de scripting Shell (Bash, PowerShell), des plugins Minecraft en Java, et explorer le C et l’assembleur sur de petits projets bas niveau. J’accorde aussi une place importante au versioning (Git) et aux outils comme Docker pour l’intégration et le déploiement.
-          </p>
-        </div>
-        <div>
-          <h3 class="reveal-up" style="--d:200ms">Trading & Finance</h3>
-          <p class="muted reveal-up" style="--d:260ms">5 ans d'expérience • Trader Funded • MQL5 • Algorithmes personnalisés</p>
-          <p class="reveal-up" style="--d:280ms">Passionné par les marchés depuis 5 ans, j'ai développé ma propre approche du trading. Trader funded, je sais garder le sang froid et gérer la pression. Au fur et à mesure, j'ai mélé mes deux passions, en créant mon propre algorithme de trading complet en MQL5.</p>
-        </div>
-        <div>
-          <h3 class="reveal-up" style="--d:200ms">Administration & Réseau</h3>
-          <p class="muted reveal-up" style="--d:260ms">Active Directory, VLSM, Cisco, SSH/Telnet, GLPI, VMware.</p>
-          <p class="reveal-up" style="--d:280ms">Formation en virtualisation et réseau durant mes deux premières années d'école. Bien que la pratique soit partie, les connaissances globales sont restées. J'utilise régulièrement VMware pour des projets personnels.</p>
+      <div class="container">
+        <div class="skills-grid">
+          <div class="skill-category reveal-up" style="--d:120ms">
+            <h3>Développement Web</h3>
+            <p class="muted">HTML, CSS, JavaScript, Vue, React, EJS, Node.js, PHP, Java, Python, Express, MQL5, SQL, MongoDB</p>
+            <p>Développement fullstack, création d'APIs, intégration de technologies variées. Solutions clés en main avec back office et front office complets pour des applications professionnelles.</p>
+          </div>
+          
+          <div class="skill-category reveal-up" style="--d:200ms">
+            <h3>Trading & Finance</h3>
+            <p class="muted">5 ans d'expérience • Trader Funded (FTMO, Quant Tekel, The5ers) • MQL5 • Algorithmes personnalisés</p>
+            <p>Passionné par les marchés depuis 5 ans, j'ai développé ma propre approche du trading. Trader funded, je sais garder le sang froid et gérer la pression. Au fur et à mesure, j'ai mélé mes deux passions, en créant mon propre algorithme de trading complet en MQL5.</p>
+          </div>
+          
+          <div class="skill-category reveal-up" style="--d:280ms">
+            <h3>Administration & Réseau</h3>
+            <p class="muted">Active Directory, VLSM, Cisco, SSH/Telnet, GLPI, VMware</p>
+            <p>Formation en virtualisation et réseau durant mes deux premières années d'école. Bien que la pratique soit partie, les connaissances globales sont restées. J'utilise régulièrement VMware pour des projets personnels.</p>
+          </div>
+          
+          <div class="skill-category reveal-up" style="--d:360ms">
+            <h3>Scripting & Outils</h3>
+            <p class="muted">Bash, PowerShell, Java, C, Assembleur, Git, Docker, Puppeteer</p>
+            <p>Scripting Shell, plugins Minecraft en Java, exploration du C et de l'assembleur sur des projets bas niveau. Versioning et outils comme Docker pour l'intégration et le déploiement. Automatisation web avec Puppeteer.</p>
+          </div>
         </div>
       </div>
       </div>
@@ -242,7 +265,7 @@
     <section class="section" id="contact">
       <div class="container center">
         <h2 class="reveal-up">Contact</h2>
-        <p class="muted reveal-up" style="--d:120ms">Alternance recherchée — disponible dès maintenant.</p>
+        <p class="muted reveal-up" style="--d:120ms">Que ce soit en alternance, ou en freelance, un mail de votre part sera le bienvenue.</p>
         <a class="btn primary reveal-up" style="--d:220ms" href="mailto:rameauloris@gmail.com">rameauloris@gmail.com</a>
         <div style="display: flex; gap: 16px; margin-top: 24px; justify-content: center;">
           <a href="https://github.com/Artex6666" target="_blank" style="display: flex; align-items: center; gap: 8px; color: #7aa2ff; text-decoration: none; transition: color .3s ease;">

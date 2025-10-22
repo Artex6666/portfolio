@@ -356,6 +356,44 @@ body {
   font-weight: 600;
 }
 
+/* /////// SKILLS GRID \\\\ */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.skill-category {
+  background: rgba(15, 23, 34, 0.6);
+  border: 1px solid rgba(122, 162, 255, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.skill-category:hover {
+  border-color: rgba(122, 162, 255, 0.3);
+  transform: translateY(-4px);
+}
+
+.skill-category h3 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.skill-category p {
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+.skill-category p:last-child {
+  margin-bottom: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .about-electric-card {
@@ -381,6 +419,15 @@ body {
   
   .info-item strong {
     min-width: auto;
+  }
+  
+  .skills-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .skill-category {
+    padding: 1.5rem;
   }
 }
 
