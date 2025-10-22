@@ -124,7 +124,7 @@ body {
 .card:hover .tech-logo { opacity: 1; }
 
 .tech-loop-container { width: 100%; overflow: hidden; margin: 32px 0; }
-.tech-loop { display: flex; gap: 40px; animation: techScroll 30s linear infinite; padding: 20px 0; will-change: transform; }
+.tech-loop { display: flex; gap: 40px; padding: 20px 0; will-change: transform; width: max-content; }
 .tech-loop img { width: 40px; height: 40px; opacity: 0.7; transition: opacity .3s ease; flex-shrink: 0; cursor: pointer; }
 .tech-loop:hover img { opacity: 1; }
 @keyframes techScroll { 

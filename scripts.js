@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Parallaxe
   setupParallax();
+  
+  // Tech loop parallaxe
+  setupTechLoopParallax();
 
   // Tilt cartes
   setupTilt();
@@ -44,6 +47,80 @@ function setupParallax() {
   };
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+// /////// TECH LOOP PARALLAXE \\ 
+function setupTechLoopParallax() {
+  const techLoop = document.querySelector('.tech-loop');
+  if (!techLoop) return;
+  
+  // Utiliser 2 copies (gauche/droite) pour la boucle infinie
+  const originalContent = techLoop.innerHTML;
+  techLoop.innerHTML = originalContent + originalContent;
+  
+  // Désactiver l'animation CSS
+  techLoop.style.animation = 'none';
+  
+  let offset = 0; // offset positif
+  let lastScrollY = window.scrollY;
+  let isScrolling = false;
+  let scrollTimeout;
+  
+  // Initialiser au centre (au début de la première copie visible)
+  const initPosition = () => {
+    const copyWidth = techLoop.scrollWidth / 2;
+    if (copyWidth > 0) {
+      offset = 0; // partir du début et défiler vers la gauche
+      return true;
+    }
+    return false;
+  };
+  
+  // Tente d'initialiser plusieurs fois au cas où le layout n'est pas prêt immédiatement
+  let tries = 0;
+  const tryInit = () => {
+    if (initPosition() || tries > 10) return;
+    tries++;
+    setTimeout(tryInit, 50);
+  };
+  tryInit();
+  
+  function updateLoop() {
+    // Mouvement automatique vers la gauche
+    offset += 0.5;
+    
+    // Ajustement par le scroll
+    const scrollY = window.scrollY;
+    const deltaY = scrollY - lastScrollY;
+    if (Math.abs(deltaY) > 0) {
+      isScrolling = true;
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => { isScrolling = false; }, 120);
+      if (deltaY > 0) {
+        // scroll down -> accélérer
+        offset += Math.min(8, Math.abs(deltaY) * 0.4);
+      }
+      // scroll up: ne pas inverser, on garde le sens gauche
+    }
+    lastScrollY = scrollY;
+
+    // Wrapping modulo robuste (gère toute valeur de offset)
+    const copyWidth = techLoop.scrollWidth / 2;
+    if (copyWidth > 0) {
+      offset = ((offset % copyWidth) + copyWidth) % copyWidth;
+    }
+
+    // Appliquer translation vers la gauche
+    techLoop.style.transform = `translateX(${-offset}px)`;
+
+    requestAnimationFrame(updateLoop);
+  }
+
+  window.addEventListener('scroll', () => {
+    // rien ici, tout est géré dans updateLoop via deltaY
+  }, { passive: true });
+
+  updateLoop();
 }
 
 // /////// TILT SUR CARTES \\\\ 
