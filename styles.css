@@ -159,8 +159,10 @@ body {
   --eb-border-width: 2px;
   position: relative;
   border-radius: inherit;
+  /* Optimisations de performance légères */
+  will-change: transform, filter;
+  transform: translate3d(0, 0, 0);
   overflow: visible;
-  isolation: isolate;
 }
 
 .eb-svg {
@@ -217,4 +219,157 @@ body {
 }
 
 /* Appliquer par défaut aux cartes */
+
+/* Optimisation pour appareils moins puissants */
+@media (prefers-reduced-motion: reduce) {
+  .electric-border {
+    animation: none !important;
+  }
+  
+  .electric-border * {
+    animation: none !important;
+  }
+}
+
+/* Assurer que l'effet électrique fonctionne */
+.electric-border:hover {
+  --electric-border-color: #ffffff;
+  --electric-light-color: oklch(from var(--electric-border-color) l c h);
+}
+
+/* Optimisation pour écrans haute densité */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .electric-border {
+    filter: contrast(0.8) brightness(1.1);
+  }
+}
+
+/* /////// ABOUT LAYOUT \\\\ */
+.about-electric-card {
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.about-electric-card::before {
+  display: none;
+}
+
+.about-layout {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+.profile-card-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+  flex: 0 0 400px;
+  max-width: 400px;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.about-text h3 {
+  color: var(--accent);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.about-text p {
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.about-text .stack {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.about-text .stack li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(122, 162, 255, 0.1);
+  color: var(--muted);
+}
+
+.about-text .stack li:last-child {
+  border-bottom: none;
+}
+
+.about-info {
+  margin: 1rem 0;
+}
+
+.info-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(122, 162, 255, 0.1);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item strong {
+  color: var(--accent);
+  min-width: 120px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .about-electric-card {
+    padding: 1.5rem;
+  }
+  
+  .about-layout {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .profile-card-container {
+    min-height: 400px;
+    flex: none;
+    max-width: none;
+  }
+  
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .info-item strong {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-electric-card {
+    padding: 1rem;
+  }
+  
+  .about-layout {
+    gap: 1.5rem;
+  }
+  
+  .profile-card-container {
+    min-height: 350px;
+  }
+  
+  .about-text h3 {
+    font-size: 1.1rem;
+  }
+}
 

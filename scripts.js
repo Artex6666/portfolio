@@ -923,6 +923,9 @@ function initElectricBorders() {
 
   const baseDur = 10; // plus lent
   const chaosScale = 18; // subtil
+  
+  // Optimisations de performance
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   cards.forEach((card, idx) => {
     card.classList.add('electric-border');
@@ -954,6 +957,9 @@ function initElectricBorders() {
     a1.setAttribute('dur', `${baseDur}s`);
     a1.setAttribute('repeatCount', 'indefinite');
     a1.setAttribute('calcMode', 'linear');
+    // Optimisation 40fps (25ms)
+    a1.setAttribute('keyTimes', '0;1');
+    a1.setAttribute('keySplines', '0.4 0 0.2 1');
     o1.appendChild(a1);
 
     const t2 = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');

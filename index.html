@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="ProfileCard.css" />
   </head>
   <body>
     <!-- /////// BACKGROUND CANVAS + LAYERS \\\\ -->
@@ -20,7 +21,7 @@
     <!-- /////// HEADER \\\\ -->
     <header class="site-header" data-parallax data-speed="0.5">
       <div class="container">
-        <a href="#" class="logo">Loris<span>Rameau</span></a>
+        <a href="#" class="logo">Loris <span>Rameau</span></a>
         <nav class="nav">
           <a href="#work">Projets</a>
           <a href="#xp">Expérience</a>
@@ -183,23 +184,47 @@
 
     <!-- /////// ABOUT \\\\ -->
     <section class="section" id="about">
-      <div class="container two-col">
-        <div>
-          <h2 class="reveal-up">À propos</h2>
-          <p class="muted reveal-up" style="--d:120ms">Binational: Franco‑Italien. Langues: Français (natif), Italien (courant), Anglais (intermédiaire). Sports: Krav Maga, Ski, StreetWorkout.</p>
-        </div>
-        <ul class="stack reveal-up" style="--d:200ms">
-          <li>Forex • Tendance/structure • Gestion du risque</li>
-          <li>WebGL/Canvas • Animations • UX</li>
-          <li>Cloud & Virtualisation</li>
-        </ul>
-      </div>
-      <div class="container" style="margin-top: 24px;">
-        <article class="card electric-enable reveal-fade" style="--i:4; display:flex; gap:16px; align-items:center;">
-          <img src="images/Kara.png" alt="Portrait" style="width:72px; height:72px; border-radius:14px; object-fit:cover; flex:0 0 auto;" />
-          <div>
-            <h3 style="margin:0 0 6px;">À propos de moi</h3>
-            <p class="muted" style="margin:0;">Âge, ville, centres d’intérêt, petite bio — remplace ce texte par tes infos.</p>
+      <div class="container">
+        <h2 class="reveal-up" style="text-align: center; margin-bottom: 3rem;">À propos de Moi</h2>
+        
+        <!-- Cadre électrique avec contenu -->
+        <article class="card electric-enable reveal-fade about-electric-card" style="--i:4;">
+          <div class="about-layout">
+            <!-- Carte de profil à gauche -->
+            <div class="profile-card-container reveal-up" style="--d:120ms">
+              <div id="profile-card-root"></div>
+            </div>
+            
+            <!-- Contenu à droite -->
+            <div class="about-content reveal-up" style="--d:200ms">
+              <div class="about-text">
+                <h3>Mon parcours</h3>
+                <div class="about-info">
+                  <div class="info-item">
+                    <strong>Âge :</strong> 20 ans
+                  </div>
+                  <div class="info-item">
+                    <strong>Nationalités :</strong> Franco-Italienne
+                  </div>
+                  <div class="info-item">
+                    <strong>Langues :</strong> Français (natif), Italien (courant), Anglais (intermédiaire)
+                  </div>
+                  <div class="info-item">
+                    <strong>Sports :</strong> Krav Maga, Ski, StreetWorkout
+                  </div>
+                </div>
+                
+                <h3 style="margin-top: 2rem;">Mes passions</h3>
+                <ul class="stack">
+                  <li>Forex • Tendance/structure • Gestion du risque</li>
+                  <li>WebGL/Canvas • Animations • UX</li>
+                  <li>Cloud & Virtualisation</li>
+                </ul>
+                
+                <h3 style="margin-top: 2rem;">Mon parcours</h3>
+                <p class="muted">Passionné d'informatique et de finance, je code — et je trade à mes heures perdues. Je cherche une alternance qui mettra à l'épreuve mes talents en logique et en développement.</p>
+              </div>
+            </div>
           </div>
         </article>
       </div>
@@ -234,7 +259,8 @@
       </div>
     </footer>
 
-    <script src="scripts.js" defer></script>
+<script src="scripts.js" defer></script>
+<script src="profile-card.js" defer></script>
   </body>
   </html>
 
