@@ -43,7 +43,6 @@
   aspect-ratio: 0.718;
   border-radius: var(--card-radius);
   position: relative;
-  background: radial-gradient(ellipse at center, #000000 0%, #000000 50%, #000000 100%);
   background-image: 
     radial-gradient(2px 2px at 20px 30px, #eee, transparent),
     radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
@@ -75,8 +74,8 @@
   /* Optimisations de performance légères */
   will-change: transform, filter;
   transform: translate3d(0, 0, 0);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  transition: transform 1s ease;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transition: transform 0.6s ease, box-shadow 0.3s ease;
   transform: translate3d(0, 0, 0.1px) rotateX(0deg) rotateY(0deg);
   overflow: hidden;
 }
@@ -85,6 +84,7 @@
 .pc-card.active {
   transition: none;
   transform: translate3d(0, 0, 0.1px) rotateX(var(--rotate-y)) rotateY(var(--rotate-x));
+  box-shadow: 0 18px 70px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.14);
 }
 
 .pc-card * {
@@ -98,7 +98,7 @@
 .pc-inside {
   inset: 1px;
   position: absolute;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.2);
   transform: translate3d(0, 0, 0.01px);
 }
 
@@ -135,12 +135,12 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  backdrop-filter: blur(30px);
+  backdrop-filter: blur(38px);
   mask: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0) 60%,
-    rgba(0, 0, 0, 1) 90%,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(0, 0, 0, 0.35) 55%,
+    rgba(0, 0, 0, 0.98) 86%,
     rgba(0, 0, 0, 1) 100%
   );
   pointer-events: none;

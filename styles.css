@@ -27,9 +27,10 @@ body {
   position: fixed; inset: 0; width: 100%; height: 100%;
   z-index: -2; display: block;
 }
-#ribbons-container {
+#ribbons-container { display: none; }
+.particles-container, #particles-container {
   position: fixed; inset: 0; width: 100%; height: 100%;
-  z-index: 1; pointer-events: none; overflow: hidden;
+  z-index: -3; pointer-events: none; overflow: hidden;
 }
 .grain {
   position: fixed; inset: -10%; pointer-events: none; z-index: -1;
@@ -91,10 +92,29 @@ body {
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
 .stack { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 20px; color: #c6d6ff; }
 .center { text-align: center; }
+/* Ajustement pour le wrapper de compétences sans cartes */
+.skills-stack h3 { color: var(--accent); margin: 0 0 8px; }
+.skills-stack p { margin: 0 0 12px; }
+
+/* /////// RADIAL SKILLS \ */
+.skills-radials { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; margin-top: 24px; align-items: center; }
+.radial { display: grid; justify-items: center; gap: 10px; }
+.radial svg { width: 140px; height: 140px; transform: rotate(-90deg); overflow: visible; }
+.radial .bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 12; }
+.radial .fg { fill: none; stroke: #7aa2ff; stroke-width: 12; stroke-linecap: round; stroke-dasharray: 327; stroke-dashoffset: 327; filter: drop-shadow(0 0 12px rgba(122,162,255,.35)); }
+.radial.c1 .fg { stroke: #7aa2ff; filter: drop-shadow(0 0 12px rgba(122,162,255,.35)); }
+.radial.c2 .fg { stroke: #2ee6a6; filter: drop-shadow(0 0 12px rgba(46,230,166,.35)); }
+.radial.c3 .fg { stroke: #ffc36b; filter: drop-shadow(0 0 12px rgba(255,195,107,.35)); }
+.radial.c4 .fg { stroke: #ff6b6b; filter: drop-shadow(0 0 12px rgba(255,107,107,.35)); }
+.radial .label { text-align: center; display: grid; gap: 4px; }
+.radial .label strong { color: #eaf2ff; }
+.radial .label span { color: var(--muted); font-weight: 700; }
+
+/* Pourcentage géré par JS (strokeDashoffset) */
 
 /* /////// FOOTER \\\\ */
 .site-footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.08); background: rgba(11,15,20,.5); }
-.site-footer .container { display: flex; align-items: center; justify-content: space-between; }
+.site-footer .container { display: flex; align-items: center; justify-content: center; }
 
 /* /////// REVEAL ANIMATIONS \\\\ */
 .reveal-up { opacity: 0; transform: translateY(20px); transition: opacity .8s cubic-bezier(0.4, 0, 0.2, 1) var(--d,0ms), transform .8s cubic-bezier(0.4, 0, 0.2, 1) var(--d,0ms); }
@@ -109,6 +129,7 @@ body {
 .tilt { transform-style: preserve-3d; perspective: 800px; }
 .tilt:hover { transform: translateY(-4px); }
 .tilt > * { transform: translateZ(30px); }
+.tilt h3, .tilt p { transform: none; }
 
 /* /////// CARD STYLES \\\\ */
 .card h3 { margin: 0 0 8px; font-size: 1.25rem; font-weight: 700; color: #eaf2ff; }
@@ -122,6 +143,11 @@ body {
 
 .tech-logo { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; opacity: 0.8; transition: opacity .3s ease; }
 .card:hover .tech-logo { opacity: 1; }
+.tech-logo[alt="Kara Tools"] { border-radius: 8px; }
+
+/* /////// PROJECTS SECTION TWEAKS \\ */
+#work .card { padding: 28px 32px; }
+#work .card .tech-logo { top: 28px; right: 32px; }
 
 .tech-loop-container { width: 100%; overflow: hidden; margin: 32px 0; }
 .tech-loop { display: flex; gap: 40px; padding: 20px 0; will-change: transform; width: max-content; }
@@ -430,6 +456,13 @@ body {
     padding: 1.5rem;
   }
 }
+
+/* /////// SKILLS PANEL (nouvelle présentation) \\ */
+.skills-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.chip { padding: 8px 12px; border-radius: 999px; background: rgba(122,162,255,.12); border: 1px solid rgba(122,162,255,.25); color: #eaf2ff; font-weight: 600; font-size: 0.95rem; letter-spacing: .2px; }
+.chip:hover { background: rgba(122,162,255,.2); }
+
+/* chips responsive: rien à faire, flex-wrap gère */
 
 @media (max-width: 480px) {
   .about-electric-card {

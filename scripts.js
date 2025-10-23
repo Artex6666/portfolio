@@ -19,9 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Tilt cartes
   setupTilt();
 
-  // Canvas FX
+  // Canvas FX (pas de fallback noir, les particules prennent le relais)
   if (!prefersReduced) initFxCanvas();
-  else enableStaticBackdrop();
+
+  // Click spark sur logos tech
+  document.querySelectorAll('.tech-loop img').forEach(img => {
+    img.addEventListener('click', (e) => {
+      const rect = img.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      createClickSpark(x, y);
+    });
+  });
+
+  // Electric Border
+  initElectricBorders();
 });
 
 // /////// REVEAL AU SCROLL \\\\ 
@@ -33,8 +45,15 @@ function setupReveal() {
     for (const e of entries) {
       if (e.isIntersecting) {
         e.target.classList.add('is-visible');
+        // Déclencher les radials après la transition reveal pour qu'on voie l'animation
+        if (e.target.classList.contains('skills-stack')) {
+          setTimeout(() => { animateRadialsIn(e.target); }, 850);
+        }
       } else {
         e.target.classList.remove('is-visible');
+        if (e.target.classList.contains('skills-stack')) {
+          resetRadials(e.target);
+        }
       }
     }
   }, { rootMargin: '0px 0px -10% 0px', threshold: 0.05 });
@@ -43,6 +62,53 @@ function setupReveal() {
   
   // Gestion spéciale pour la section À propos
   setupAboutSectionAnimation();
+}
+
+// /////// RADIALS \\
+function animateRadialsIn(rootEl) {
+  if (!rootEl || rootEl.__radialsAnimated) return;
+  const fgs = rootEl.querySelectorAll('.radial .fg[data-percent]');
+  if (!fgs.length) return;
+  rootEl.__radialsAnimated = true;
+  
+  // Utiliser une timeline commune pour synchroniser texte et tracé (durée 2s)
+  const start = performance.now();
+  const baseDelay = 150; // léger décalage entre graphes
+  const duration = 2000; // 2s demandées
+  const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3);
+
+  function frame(t) {
+    let allDone = true;
+    fgs.forEach((c, idx) => {
+      const p = parseFloat(c.getAttribute('data-percent') || '0');
+      const total = 2 * Math.PI * 52;
+      c.style.strokeDasharray = String(total);
+      const label = c.closest('.radial')?.querySelector('.label span');
+
+      const tt = Math.max(0, t - start - idx * baseDelay);
+      const k = Math.min(1, tt / duration);
+      const current = p * easeOutCubic(k);
+      const offset = total * (1 - current / 100);
+      c.style.strokeDashoffset = String(offset);
+      if (label) label.textContent = Math.round(current) + '%';
+      if (k < 1) allDone = false;
+    });
+    if (!allDone) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function resetRadials(rootEl) {
+  if (!rootEl) return;
+  rootEl.__radialsAnimated = false;
+  const fgs = rootEl.querySelectorAll('.radial .fg[data-percent]');
+  const total = 2 * Math.PI * 52;
+  fgs.forEach(c => {
+    c.style.strokeDasharray = String(total);
+    c.style.strokeDashoffset = String(total);
+    const label = c.closest('.radial')?.querySelector('.label span');
+    if (label) label.textContent = '0%';
+  });
 }
 
 // /////// ANIMATION SECTION À PROPOS \\\\ 
@@ -314,9 +380,10 @@ function initFxCanvas() {
 
   function drawBackdrop(ctx, w, h) {
     const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, 'rgba(10,16,25,0.9)');
-    g.addColorStop(1, 'rgba(8,12,18,0.85)');
-    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+    g.addColorStop(0, 'rgba(10,16,25,1)');
+    g.addColorStop(1, 'rgba(8,12,18,1)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
   }
 
   function drawGrid(ctx, w, h) {
@@ -672,253 +739,13 @@ function initFxCanvas() {
         const low = logs[Math.floor(0.05 * (logs.length-1))];
         const high = logs[Math.floor(0.95 * (logs.length-1))];
         const mid = (low + high) / 2;
-        cameraCenterLog = mid; // centrer sur le milieu du range initial
-        // garder la plage initiale fixe pour des bougies de taille constante
-        // baseRangeLog reste inchangé
+        cameraCenterLog = mid; 
       }
     })();
 
     function setFollow(getter) { followRef = getter; }
     function getRefPrice() { return current.c; }
     return { update, draw, depth, setFollow, getRefPrice };
-  }
-}
-
-function enableStaticBackdrop() {
-  const canvas = document.getElementById('fx-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const width = canvas.width = window.innerWidth;
-  const height = canvas.height = window.innerHeight;
-  ctx.fillStyle = '#0b0f14';
-  ctx.fillRect(0,0,width,height);
-  ctx.globalAlpha = 0.1;
-  ctx.strokeStyle = '#7aa2ff';
-  const step = 64;
-  ctx.beginPath();
-  for (let x = 0; x < width; x += step) { ctx.moveTo(x,0); ctx.lineTo(x,height); }
-  for (let y = 0; y < height; y += step) { ctx.moveTo(0,y); ctx.lineTo(width,y); }
-  ctx.stroke();
-}
-
-// /////// RIBBONS ANIMATION \\\\
-class Ribbon {
-  constructor(container, color, index) {
-    this.container = container;
-    this.color = color;
-    this.index = index;
-    this.points = [];
-    this.velocity = { x: 0, y: 0 };
-    this.spring = 0.03 + (Math.random() - 0.5) * 0.01;
-    this.friction = 0.9 + (Math.random() - 0.5) * 0.05;
-    this.thickness = 20 + Math.random() * 10;
-    // Pas de décalage: la sphère s'aligne exactement sur le curseur
-    this.offset = { x: 0, y: 0 };
-    this.maxAge = 500;
-    this.pointCount = 30;
-    this.speedMultiplier = 0.6;
-    this.fading = false;
-    
-    this.initPoints();
-    this.createElement();
-  }
-  
-  initPoints() {
-    for (let i = 0; i < this.pointCount; i++) {
-      this.points.push({ x: 0, y: 0, age: 0 });
-    }
-  }
-  
-  createElement() {
-    this.element = document.createElement('div');
-    this.element.className = 'ribbon';
-    this.element.style.position = 'absolute';
-    this.element.style.width = '2px';
-    this.element.style.height = '2px';
-    this.element.style.background = this.color;
-    this.element.style.borderRadius = '50%';
-    this.element.style.boxShadow = `0 0 ${this.thickness}px ${this.color}`;
-    this.element.style.opacity = '0';
-    this.element.style.display = 'none';
-    this.element.style.visibility = 'hidden';
-    this.element.style.transition = 'all 0.1s ease-out';
-    this.container.appendChild(this.element);
-  }
-  
-  update(mouseX, mouseY, dt, isActive) {
-    const targetX = mouseX + this.offset.x;
-    const targetY = mouseY + this.offset.y;
-
-    // Afficher uniquement si actif ou en phase de fondu
-    if (!isActive && !this.fading) {
-      this.element.style.display = 'none';
-      this.element.style.visibility = 'hidden';
-      return;
-    }
-    this.element.style.display = 'block';
-    this.element.style.visibility = 'visible';
-
-    // Mise à jour du premier point (suivi curseur avec ressort + friction)
-    const dx = targetX - this.points[0].x;
-    const dy = targetY - this.points[0].y;
-
-    this.velocity.x += dx * this.spring;
-    this.velocity.y += dy * this.spring;
-    this.velocity.x *= this.friction;
-    this.velocity.y *= this.friction;
-
-    this.points[0].x += this.velocity.x;
-    this.points[0].y += this.velocity.y;
-
-    // Mise à jour des segments (suivent le précédent)
-    for (let i = 1; i < this.points.length; i++) {
-      const prev = this.points[i - 1];
-      const current = this.points[i];
-
-      const segmentDelay = this.maxAge / (this.points.length - 1);
-      const alpha = Math.min(1, (dt * this.speedMultiplier) / segmentDelay);
-
-      current.x += (prev.x - current.x) * alpha;
-      current.y += (prev.y - current.y) * alpha;
-      current.age += dt;
-    }
-
-    // Mise à jour visuelle
-    this.updateVisual();
-
-    // En mode fondu: n'amorcer l'extinction qu'une fois très proche de la cible
-    if (this.fading) {
-      const dxClose = (mouseX + this.offset.x) - this.points[0].x;
-      const dyClose = (mouseY + this.offset.y) - this.points[0].y;
-      const dist = Math.hypot(dxClose, dyClose);
-      if (dist < 10) {
-        const currentOpacity = parseFloat(this.element.style.opacity) || 0.4;
-        const newOpacity = Math.max(0, currentOpacity - dt * 0.0012);
-        this.element.style.opacity = String(newOpacity);
-        if (newOpacity <= 0.01) {
-          this.element.style.display = 'none';
-          this.element.style.visibility = 'hidden';
-          this.element.style.opacity = '0';
-          this.fading = false;
-        }
-      }
-    }
-  }
-  
-  updateVisual() {
-    const first = this.points[0];
-    this.element.style.left = first.x + 'px';
-    this.element.style.top = first.y + 'px';
-    
-    // Create trail effect
-    this.element.style.background = `radial-gradient(circle, ${this.color} 0%, transparent 70%)`;
-    this.element.style.width = this.thickness + 'px';
-    this.element.style.height = this.thickness + 'px';
-    this.element.style.transform = 'translate(-50%, -50%)';
-    
-    // Opacité basée sur l'âge uniquement si pas en fondu
-    if (!this.fading) {
-      const age = this.points[0].age;
-      const fade = Math.max(0, 1 - (age / this.maxAge));
-      this.element.style.opacity = String(fade * 0.4);
-    }
-  }
-  
-  fadeOut(dt) {
-    // Immediately hide when mouse is not moving
-    this.element.style.display = 'none';
-    this.element.style.opacity = '0';
-    this.element.style.visibility = 'hidden';
-  }
-
-  startFade() {
-    this.fading = true;
-  }
-  
-  
-  destroy() {
-    if (this.element && this.element.parentNode) {
-      this.element.parentNode.removeChild(this.element);
-    }
-  }
-}
-
-class RibbonsManager {
-  constructor(container) {
-    this.container = container;
-    this.ribbons = [];
-    this.mouse = { x: 0, y: 0 };
-    // Deux sphères: bleu et rouge
-    this.colors = ['#7aa2ff', '#ff6b6b'];
-    this.lastTime = performance.now();
-    this.isActive = false;
-    
-    this.init();
-  }
-  
-  init() {
-    // Create ribbons
-    this.colors.forEach((color, index) => {
-      this.ribbons.push(new Ribbon(this.container, color, index));
-    });
-    
-    // Mouse tracking + idle timer
-    this._idleTimer = null;
-    this._idleDelayMs = 300;
-    this._hideAll = () => {
-      // Passer en mode fade des rubans; l'extinction se fera
-      // uniquement une fois alignés au curseur pour une disparition douce
-      if (this.isActive) this.isActive = false;
-      this.ribbons.forEach(ribbon => ribbon.startFade());
-      // Debug
-      console.log('[ribbons] idle -> fade');
-    };
-
-    this.handleMouseMove = (e) => {
-      this.mouse.x = e.clientX;
-      this.mouse.y = e.clientY;
-      this.isActive = true;
-      // Annule le fade si on reprend le mouvement
-      this.ribbons.forEach(ribbon => { ribbon.fading = false; });
-      if (this._idleTimer) clearTimeout(this._idleTimer);
-      this._idleTimer = setTimeout(this._hideAll, this._idleDelayMs);
-    };
-    
-    this.handleMouseLeave = () => {
-      this.isActive = false;
-      // Force hide all ribbons immediately
-      this.ribbons.forEach(ribbon => {
-        ribbon.element.style.display = 'none';
-        ribbon.element.style.opacity = '0';
-        ribbon.element.style.visibility = 'hidden';
-      });
-    };
-    
-    document.addEventListener('mousemove', this.handleMouseMove);
-    document.addEventListener('mouseleave', this.handleMouseLeave);
-    
-    // Animation loop
-    this.animate();
-  }
-  
-  animate() {
-    const currentTime = performance.now();
-    const dt = currentTime - this.lastTime;
-    this.lastTime = currentTime;
-    
-    // Toujours mettre à jour pour permettre l'inertie et le fondu après l'arrêt
-    this.ribbons.forEach(ribbon => {
-      ribbon.update(this.mouse.x, this.mouse.y, dt, this.isActive);
-    });
-    
-    // Continue animation
-    requestAnimationFrame(() => this.animate());
-  }
-  
-  destroy() {
-    document.removeEventListener('mousemove', this.handleMouseMove);
-    document.removeEventListener('mouseleave', this.handleMouseLeave);
-    this.ribbons.forEach(ribbon => ribbon.destroy());
   }
 }
 
@@ -946,11 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
   enableStaticBackdrop();
   document.getElementById('year').textContent = new Date().getFullYear();
   
-  // Initialize ribbons animation
-  const ribbonsContainer = document.getElementById('ribbons-container');
-  if (ribbonsContainer) {
-    ribbonsManager = new RibbonsManager(ribbonsContainer);
-  }
+  // Ribbons disabled
   
   // Click spark on tech logos
   document.querySelectorAll('.tech-loop img').forEach(img => {

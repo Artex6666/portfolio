@@ -14,6 +14,7 @@
   <body>
     <!-- /////// BACKGROUND CANVAS + LAYERS \\\\ -->
     <canvas id="fx-canvas" aria-hidden="true"></canvas>
+    <div id="particles-container" aria-hidden="true"></div>
     <div id="ribbons-container" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
     <div class="glow-layer" aria-hidden="true"></div>
@@ -23,11 +24,9 @@
       <div class="container">
         <a href="#" class="logo">Loris <span>Rameau</span></a>
         <nav class="nav">
-          <a href="#work">Projets</a>
           <a href="#xp">Expérience</a>
           <a href="#skills">Compétences</a>
           <a href="#about">À propos</a>
-          <a href="#contact">Contact</a>
         </nav>
       </div>
     </header>
@@ -188,11 +187,12 @@
         </div>
       </div>
     </section>
+    <div class="metric-chart"></div>
 
     <!-- /////// COMPETENCES \\\\ -->
     <section class="section" id="skills">
       <div class="container">
-        <h2 class="reveal-up">Compétences</h2>
+        <h2 class="reveal-up" style="text-align: center;">Compétences</h2>
       </div>
       
       <!-- /////// TECH LOOP \\\\ -->
@@ -214,7 +214,6 @@
           <a href="https://en.cppreference.com/w/c" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" alt="C"></a>
           <a href="https://dev.mysql.com/doc/" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL"></a>
           <a href="https://www.json.org/json-en.html" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/json/json-original.svg" alt="JSON"></a>
-          <a href="https://ejs.co/" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ejs/ejs-original.svg" alt="EJS"></a>
           <a href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg" alt="SQLite"></a>
           <a href="https://learn.microsoft.com/en-us/visualstudio/" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/visualstudio/visualstudio-plain.svg" alt="Visual Studio"></a>
           <a href="https://docs.microsoft.com/en-us/powershell/" target="_blank" rel="noopener"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/powershell/powershell-original.svg" alt="PowerShell"></a>
@@ -231,29 +230,51 @@
       </div>
       
       <div class="container">
-        <div class="skills-grid">
-          <div class="skill-category reveal-up" style="--d:120ms">
+        <div class="two-col skills-stack reveal-up" style="--d:160ms">
+          <div>
             <h3>Développement Web</h3>
             <p class="muted">HTML, CSS, JavaScript, Vue, React, EJS, Node.js, PHP, Java, Python, Express, MQL5, SQL, MongoDB</p>
             <p>Développement fullstack, création d'APIs, intégration de technologies variées. Solutions clés en main avec back office et front office complets pour des applications professionnelles.</p>
-          </div>
-          
-          <div class="skill-category reveal-up" style="--d:200ms">
-            <h3>Trading & Finance</h3>
+
+            <h3 style="margin-top: 20px;">Trading & Finance</h3>
             <p class="muted">5 ans d'expérience • Trader Funded (FTMO, Quant Tekel, The5ers) • MQL5 • Algorithmes personnalisés</p>
-            <p>Passionné par les marchés depuis 5 ans, j'ai développé ma propre approche du trading. Trader funded, je sais garder le sang froid et gérer la pression. Au fur et à mesure, j'ai mélé mes deux passions, en créant mon propre algorithme de trading complet en MQL5.</p>
-          </div>
-          
-          <div class="skill-category reveal-up" style="--d:280ms">
-            <h3>Administration & Réseau</h3>
+            <p>Passionné par les marchés depuis 5 ans, j'ai développé ma propre approche du trading. Trader funded, je sais garder le sang froid et gérer la pression. Au fur et à mesure, j'ai mêlé mes deux passions, en créant mon propre algorithme de trading complet en MQL5.</p>
+
+            <h3 style="margin-top: 20px;">Administration & Réseau</h3>
             <p class="muted">Active Directory, VLSM, Cisco, SSH/Telnet, GLPI, VMware</p>
             <p>Formation en virtualisation et réseau durant mes deux premières années d'école. Bien que la pratique soit partie, les connaissances globales sont restées. J'utilise régulièrement VMware pour des projets personnels.</p>
           </div>
-          
-          <div class="skill-category reveal-up" style="--d:360ms">
-            <h3>Scripting & Outils</h3>
-            <p class="muted">Bash, PowerShell, Java, C, Assembleur, Git, Docker, Puppeteer</p>
-            <p>Scripting Shell, plugins Minecraft en Java, exploration du C et de l'assembleur sur des projets bas niveau. Versioning et outils comme Docker pour l'intégration et le déploiement. Automatisation web avec Puppeteer.</p>
+          <div>
+            <div class="skills-radials">
+              <div class="radial c1">
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                  <circle class="bg" cx="60" cy="60" r="52" />
+                  <circle class="fg" cx="60" cy="60" r="52" data-percent="75" />
+                </svg>
+                <div class="label"><strong>Backend</strong><span>75%</span></div>
+              </div>
+              <div class="radial c2">
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                  <circle class="bg" cx="60" cy="60" r="52" />
+                  <circle class="fg" cx="60" cy="60" r="52" data-percent="65" />
+                </svg>
+                <div class="label"><strong>Frontend</strong><span>65%</span></div>
+              </div>
+              <div class="radial c3">
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                  <circle class="bg" cx="60" cy="60" r="52" />
+                  <circle class="fg" cx="60" cy="60" r="52" data-percent="70" />
+                </svg>
+                <div class="label"><strong>GNU / Sys</strong><span>70%</span></div>
+              </div>
+              <div class="radial c4">
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                  <circle class="bg" cx="60" cy="60" r="52" />
+                  <circle class="fg" cx="60" cy="60" r="52" data-percent="70" />
+                </svg>
+                <div class="label"><strong>DevOps</strong><span>70%</span></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -290,8 +311,9 @@
       </div>
     </footer>
 
-<script src="scripts.js" defer></script>
-<script src="profile-card.js" defer></script>
+<script module src="scripts.js" defer></script>
+<script module src="background.js" defer></script>
+<script module src="profile-card.js" defer></script>
   </body>
   </html>
 
