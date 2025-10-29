@@ -92,6 +92,8 @@ body {
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
 .stack { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 20px; color: #c6d6ff; }
 .center { text-align: center; }
+/* /////// CONTACT \\ */
+#contact { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
 /* Ajustement pour le wrapper de compétences sans cartes */
 .skills-stack h3 { color: var(--accent); margin: 0 0 8px; }
 .skills-stack p { margin: 0 0 12px; }
@@ -113,7 +115,7 @@ body {
 /* Pourcentage géré par JS (strokeDashoffset) */
 
 /* /////// FOOTER \\\\ */
-.site-footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.08); background: rgba(11,15,20,.5); }
+.site-footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.08); background: rgba(11,15,20,.5); margin-top: 32px; }
 .site-footer .container { display: flex; align-items: center; justify-content: center; }
 
 /* /////// REVEAL ANIMATIONS \\\\ */

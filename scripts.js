@@ -416,11 +416,11 @@ function initFxCanvas() {
 
     let price = 100 + Math.random() * 10;
     let lastClose = price;
-    let vol = 0.008; // volatilité réduite pour des bougies plus stables
+    let vol = 0.008; // même vol de base que le préfill
     let targetVol = 0.008;
-    // Dérive haussière contrôlée
-    let drift = 0.0003;
-    let targetDrift = 0.0003;
+    // Pas de dérive pour matcher le préfill
+    let drift = 0;
+    let targetDrift = 0;
     // biais directionnel serpentin (AR1) et séquences vendeuses ponctuelles
     let trendBias = 0.5; // [-1,1] >0 à la hausse
     let bearStreakLeft = 0; // nombre de bougies rouges à enchaîner
@@ -443,6 +443,27 @@ function initFxCanvas() {
     let cameraCenterLog = baseLog; // centre vertical de la caméra
     let baseRangeLog = 0.022; // plage log fixe pour des bougies de taille constante
     let followRef = null; // fonction de suivi (pour secondaire)
+    // Biais par bougie (tendance intra‑bougie) pour éviter les dojis systématiques
+    let candleTrend = 0; // ajouté à chaque tick pendant la bougie en cours
+    // Mode de mèches décidé à l'ouverture de la bougie pour éviter le repaint
+    // 0: normal, 1: marubozu (pas de mèches), 2: sans mèche haute, 3: sans mèche basse
+    let wickMode = 0;
+
+    function pickWickMode() {
+      const r = Math.random();
+      if (r < 0.08) return 1; // ~8% marubozu
+      if (r < 0.24) return Math.random() < 0.5 ? 2 : 3; // ~16% une seule mèche
+      return 0;
+    }
+
+    function applyWickClampToCurrent() {
+      if (wickMode === 0) return;
+      const bodyHi = Math.max(current.o, current.c);
+      const bodyLo = Math.min(current.o, current.c);
+      if (wickMode === 1) { current.h = bodyHi; current.l = bodyLo; return; }
+      if (wickMode === 2) { if (current.h > bodyHi) current.h = bodyHi; return; }
+      if (wickMode === 3) { if (current.l < bodyLo) current.l = bodyLo; return; }
+    }
 
     function randn() {
       // Box-Muller
@@ -457,53 +478,20 @@ function initFxCanvas() {
       visibleCount = Math.max(16, Math.floor((w * widthFrac) / (candlestickWidth + gap)));
       maxHistory = Math.max(0, visibleCount - 1);
 
-      // volatilité qui dérive doucement (clusters)
-      volTimer += dt;
-      if (volTimer > 1200 + Math.random() * 1800) {
-        targetVol = clamp(vol * (0.8 + Math.random() * 0.4), 0.004, 0.025);
-        // cible de dérive autour d'une moyenne positive
-        targetDrift = 0.00025 + (Math.random() - 0.3) * 0.0005;
-        volTimer = 0;
-      }
-      vol += (targetVol - vol) * 0.02;
-      drift += (targetDrift - drift) * 0.02;
-      // AR(1) sur le biais pour serpentin
-      trendBias = clamp(0.92 * trendBias + 0.08 * (Math.random() * 2 - 1), -0.9, 0.9);
-      // attraction douce vers le primaire si follow activé (sur prix log)
-      if (typeof followRef === 'function') {
-        const ref = followRef();
-        if (ref > 0) {
-          const diff = Math.log(ref) - Math.log(price);
-          drift += diff * 0.0003; // très discret
-        }
-      }
+      // Pas d'évolution de vol/drift pour reproduire exactement le préfill
+      volTimer += dt; // conservé mais sans effet
 
-      // micro ticks à l’intérieur de la bougie
+      // micro ticks à l’intérieur de la bougie — même modèle que le préfill
       const ticks = Math.max(1, Math.round(dt / 16));
       for (let i = 0; i < ticks; i++) {
-        // tendance haussière réaliste: bruit gaussien + drift positif doux,
-        // amortir les renversements brutaux pour éviter l'alternance trop régulière
-        let shock = randn() * (vol * 0.6) * Math.sqrt(16 / 1000);
-        const meanRev = (lastClose - price) * 0.0005; // légère force de rappel
-        // biais directionnel: globalement haussier, mais peut devenir négatif
-        const directional = drift + 0.0005 * trendBias + (bearStreakLeft > 0 ? -0.0010 : 0);
-        shock += meanRev + directional;
-        const prev = price;
+        const shock = (randn() * vol * 0.5) * Math.sqrt(100 / 1000); // amplitude runtime ÷2 pour matcher le préfill
         price = Math.max(0.1, price * (1 + shock));
         // mise à jour OHLC stricte
         current.c = price;
         if (current.h < price) current.h = price;
         if (current.l > price) current.l = price;
-        // empêcher la bougie en cours d'écraser trop les précédentes: limiter amplitude incrémentale
-        const maxIntraMove = vol * 4; // borne légèrement plus permissive pour grosses bougies
-        const move = Math.log(price) - Math.log(prev);
-        if (Math.abs(move) > maxIntraMove) {
-          const clampSign = move > 0 ? 1 : -1;
-          const adjusted = Math.exp(Math.log(prev) + clampSign * maxIntraMove);
-          price = adjusted; current.c = adjusted;
-          if (current.h < adjusted) current.h = adjusted;
-          if (current.l > adjusted) current.l = adjusted;
-        }
+        // appliquer la contrainte de mèche choisie à l'ouverture
+        applyWickClampToCurrent();
       }
       // suivi log
       const logP = Math.log(price);
@@ -513,6 +501,26 @@ function initFxCanvas() {
       if (elapsed >= candleMs) {
         // clôture
         current.o = lastClose;
+        // vectorisation probabiliste des mèches à la clôture
+        // - petites chances d'avoir des marubozu (sans mèches)
+        // - chances modérées d'enlever UNE des deux mèches
+        {
+          const bodyHi = Math.max(current.o, current.c);
+          const bodyLo = Math.min(current.o, current.c);
+          const r = Math.random();
+          if (r < 0.08) { // ~8% marubozu
+            current.h = bodyHi;
+            current.l = bodyLo;
+          } else if (r < 0.24) { // ~16% une seule mèche
+            if (Math.random() < 0.5) {
+              // pas de mèche haute
+              current.h = bodyHi;
+            } else {
+              // pas de mèche basse
+              current.l = bodyLo;
+            }
+          }
+        }
         // figer la taille en pixels à la clôture
         const panelInfo = computePanel(w, h);
         const scaleYClose = panelInfo.scaleY;
@@ -538,18 +546,13 @@ function initFxCanvas() {
         // démarrer une nouvelle bougie avec O=dernier close et H=L=O
         current = { o: lastClose, h: lastClose, l: lastClose, c: lastClose };
         elapsed = 0;
+        // pas de tendance intra‑bougie pour rester identique au préfill
+        candleTrend = 0;
+        // décider le mode de mèche pour la nouvelle bougie
+        wickMode = pickWickMode();
 
-        // gestion des séquences vendeuses pour créer des séries rouges réalistes
-        const justRed = lastClose < candles[candles.length-1]?.o;
-        if (bearStreakLeft > 0) {
-          bearStreakLeft -= 1;
-        } else {
-          // probabilité élevée de séquences rouges pour équilibrer
-          const pStartBear = 0.12 + Math.max(0, 0.08 - trendBias * 0.06);
-          if (Math.random() < pStartBear) {
-            bearStreakLeft = 1 + Math.floor(Math.random() * 2); // séquences courtes pour éviter enchaînements
-          }
-        }
+        // désactiver les séquences vendeuses pour rester fidèle au préfill
+        bearStreakLeft = 0;
       }
     }
 
@@ -650,9 +653,9 @@ function initFxCanvas() {
         ctx.globalAlpha = 0.9 * depth; // opacité constante
         for (let i = 0; i < Math.min(windowCandles.length, maxHistory); i++) {
           const c = windowCandles[i];
-          drawCandle(ctx, xStart + i * stepX, scaleY, normalizeCandle(c), candlestickWidth);
+          drawCandle(ctx, xStart + i * stepX, scaleY, c, candlestickWidth);
         }
-        // bougie en cours toujours à l'index final
+        // bougie en cours toujours à l'index final (brute pour respecter OHLC en temps réel)
         const currentIndex = Math.min(windowCandles.length, maxHistory);
         drawCandle(ctx, (leftX - baseOffset) + currentIndex * stepX, scaleY, current, candlestickWidth);
         ctx.restore();
@@ -676,24 +679,27 @@ function initFxCanvas() {
 
   // rendre les bougies plus "pleines": réduire les mèches trop longues et forcer un corps minimum
   function normalizeCandle(c) {
-    const minBody = 0.2; // 20% de l'amplitude devient corps minimum (plus de mèches)
     const o = c.o, h = c.h, l = c.l, close = c.c;
     const amp = Math.max(1e-6, h - l);
-    let body = Math.abs(close - o);
-    if (body < amp * minBody) {
+    const minBody = 0.25; // forcer des corps plus présents
+    let bodyAbs = Math.abs(close - o);
+
+    if (bodyAbs < amp * minBody) {
       const mid = (o + close) / 2;
       const halfBody = (amp * minBody) / 2;
       const newO = mid - halfBody;
       const newC = mid + halfBody;
-      // recouper mèches si elles sont > 60% de l’amplitude
-      const newH = Math.max(newO, newC) + amp * 0.2;
-      const newL = Math.min(newO, newC) - amp * 0.2;
+      bodyAbs = Math.abs(newC - newO);
+      const wick = bodyAbs * 0.25; // mèches max ~25% du corps
+      const newH = Math.max(newO, newC) + wick;
+      const newL = Math.min(newO, newC) - wick;
       return { o: newO, h: newH, l: newL, c: newC };
     }
-    // limiter mèches extrêmes (plus de mèches autorisées)
-    const cap = amp * 1.0;
-    const hi = Math.min(h, Math.max(o, close) + cap * 0.7);
-    const lo = Math.max(l, Math.min(o, close) - cap * 0.7);
+
+    // caper les mèches en fonction du corps (pas de l'amplitude brute)
+    const wickMax = bodyAbs * 0.35;
+    const hi = Math.min(h, Math.max(o, close) + wickMax);
+    const lo = Math.max(l, Math.min(o, close) - wickMax);
     return { o, h: hi, l: lo, c: close };
   }
 
